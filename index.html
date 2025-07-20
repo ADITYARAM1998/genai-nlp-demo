@@ -808,3 +808,273 @@ def generate_response(query: str, context: list, user_metadata: dict):
             "What providers are in my network?": "Your plan uses the **Blue Cross Blue Shield Network**, one of the largest provider networks in the United States.\n\n🏥 **Network Access:**\n• 90%+ of hospitals nationwide\n• 95%+ of physicians\n• Specialists in all major medical fields\n• 24/7 telemedicine options\n\nYou can search for in-network providers using the BCBS website or mobile app to ensure you receive maximum benefits.",
             
             "How do I file a claim?": "For your Silver PPO plan, most claims are filed automatically by your healthcare provider. However, if you need to file manually:\n\n📋 **Claims Process:**\n1. **Obtain** itemized bills and receipts\n2. **Complete** the claim form from your insurance portal\n3. **Submit** within 90 days of service\n4. **Track** status through your online account\n5. **Receive** reimbursement within 30 days\n\n💡 **Pro Tip:** Keep all medical receipts and use the mobile app for faster claim submission."
+        };
+        
+        // Tab navigation system
+        function showTab(tabName) {
+            // Hide all tabs
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.querySelectorAll('.nav-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Show selected tab
+            document.getElementById(tabName).classList.add('active');
+            event.target.classList.add('active');
+        }
+        
+        // File upload handling
+        function handleFileSelect(input) {
+            const file = input.files[0];
+            if (file) {
+                const fileSizeKB = (file.size / 1024).toFixed(2);
+                const fileDate = new Date(file.lastModified).toLocaleDateString();
+                
+                document.getElementById('fileInfo').innerHTML = `
+                    <div class="file-info">
+                        <strong>📄 Selected File:</strong> ${file.name}<br>
+                        <strong>📊 File Size:</strong> ${fileSizeKB} KB<br>
+                        <strong>📅 Last Modified:</strong> ${fileDate}<br>
+                        <strong>🔧 Status:</strong> Ready for processing
+                    </div>
+                `;
+                document.getElementById('uploadBtn').disabled = false;
+            }
+        }
+        
+        // Simulate document upload and processing
+        function simulateUpload() {
+            const ssn = document.getElementById('ssn').value;
+            const docType = document.getElementById('docType').value;
+            const fileInput = document.getElementById('fileInput');
+            
+            if (!ssn || !fileInput.files[0]) {
+                showStatus('error', '❌ Please provide SSN and select a file.');
+                return;
+            }
+            
+            // Validate SSN format
+            if (!/^\d{3}-\d{2}-\d{4}$/.test(ssn)) {
+                showStatus('error', '❌ Please enter SSN in format: 123-45-6789');
+                return;
+            }
+            
+            currentUser = ssn;
+            document.getElementById('currentSSN').value = ssn;
+            document.getElementById('uploadBtn').disabled = true;
+            
+            // Simulate realistic upload process
+            const steps = [
+                { message: '📤 Uploading document to secure server...', delay: 1000 },
+                { message: '🔍 Running Document Intelligence analysis...', delay: 1500 },
+                { message: '📊 Extracting structured fields and metadata...', delay: 1200 },
+                { message: '🧠 Creating semantic vector embeddings...', delay: 1800 },
+                { message: '💾 Storing in vector database for fast retrieval...', delay: 1000 },
+                { message: '✅ Document processed successfully! Ready for Q&A.', delay: 500 }
+            ];
+            
+            let currentStep = 0;
+            
+            function processStep() {
+                if (currentStep < steps.length) {
+                    const step = steps[currentStep];
+                    const isLast = currentStep === steps.length - 1;
+                    
+                    showStatus(isLast ? 'success' : 'info', step.message);
+                    
+                    if (isLast) {
+                        displayExtractedFields();
+                        updatePipelineStatus();
+                        updateMetrics();
+                        document.getElementById('uploadBtn').disabled = false;
+                    }
+                    
+                    currentStep++;
+                    if (!isLast) {
+                        setTimeout(processStep, step.delay);
+                    }
+                } 
+            }
+            
+            processStep();
+        }
+        
+        // Display processing status
+        function showStatus(type, message) {
+            const statusDiv = document.getElementById('uploadStatus');
+            statusDiv.innerHTML = `<div class="status ${type}">${message}</div>`;
+        }
+        
+        // Display extracted fields with animation
+        function displayExtractedFields() {
+            const fieldsDiv = document.getElementById('extractedFields');
+            let fieldsHtml = '<div class="extracted-fields">';
+            
+            for (const [key, value] of Object.entries(demoExtractedFields)) {
+                fieldsHtml += `
+                    <div class="field-item">
+                        <strong>${key}:</strong><br>
+                        <span style="color: #666;">${value}</span>
+                    </div>
+                `;
+            }
+            fieldsHtml += '</div>';
+            fieldsDiv.innerHTML = fieldsHtml;
+        }
+        
+        // Update pipeline status with realistic timing
+        function updatePipelineStatus() {
+            const steps = document.querySelectorAll('.pipeline-status');
+            
+            steps.forEach((step, index) => {
+                setTimeout(() => {
+                    const indicator = step.querySelector('.status-indicator');
+                    const statusText = step.querySelector('span:last-child');
+                    
+                    // Processing state
+                    indicator.className = 'status-indicator processing';
+                    statusText.textContent = 'Processing...';
+                    
+                    // Completed state
+                    setTimeout(() => {
+                        indicator.className = 'status-indicator completed';
+                        statusText.textContent = 'Completed ✓';
+                    }, 1200);
+                }, index * 1400);
+            });
+        }
+        
+        // Update metrics dashboard
+        function updateMetrics() {
+            setTimeout(() => {
+                document.getElementById('processedDocs').textContent = '1';
+            }, 1000);
+            
+            setTimeout(() => {
+                document.getElementById('extractedFields').textContent = Object.keys(demoExtractedFields).length;
+            }, 2000);
+            
+            setTimeout(() => {
+                document.getElementById('vectorChunks').textContent = '42';
+            }, 3000);
+            
+            setTimeout(() => {
+                document.getElementById('queryAccuracy').textContent = '97%';
+            }, 4000);
+        }
+        
+        // Chat functionality
+        function askQuestion() {
+            const query = document.getElementById('userInput').value.trim();
+            if (!query) return;
+            
+            if (!currentUser) {
+                alert('⚠️ Please upload a document first to enable AI chat!');
+                return;
+            }
+            
+            addMessage('user', query);
+            document.getElementById('userInput').value = '';
+            
+            // Simulate AI processing
+            setTimeout(() => {
+                addMessage('bot', '🤔 Analyzing your question and searching through document content...');
+                
+                setTimeout(() => {
+                    // Remove processing message
+                    const messages = document.getElementById('chatMessages');
+                    messages.removeChild(messages.lastChild);
+                    
+                    // Generate intelligent response
+                    const response = demoResponses[query] || generateSmartResponse(query);
+                    addMessage('bot', response);
+                }, 2500);
+            }, 500);
+        }
+        
+        // Handle predefined questions
+        function askPredefinedQuestion(question) {
+            document.getElementById('userInput').value = question;
+            askQuestion();
+        }
+        
+        // Handle Enter key in chat
+        function handleEnterKey(event) {
+            if (event.key === 'Enter' && !event.shiftKey) {
+                event.preventDefault();
+                askQuestion();
+            }
+        }
+        
+        // Generate contextual responses
+        function generateSmartResponse(query) {
+            const queryLower = query.toLowerCase();
+            const planName = demoExtractedFields.PlanName;
+            
+            if (queryLower.includes('cost') || queryLower.includes('price') || queryLower.includes('premium')) {
+                return `Based on your ${planName}, here are the key cost details:\n\n💰 **Your Costs:**\n• Annual Deductible: $2,500\n• Primary Care: $25 co-pay\n• Specialist Visit: $50 co-pay\n• Out-of-Pocket Max: $8,000\n\n📊 *Analysis based on your uploaded document using NLP extraction.*`;
+            }
+            
+            if (queryLower.includes('cover') || queryLower.includes('benefit')) {
+                return `Your ${planName} provides comprehensive coverage including:\n\n🏥 **Covered Services:**\n• Preventive care (100% covered)\n• Emergency services\n• Prescription drugs\n• Mental health services\n• Maternity care\n\n📋 *Detailed benefits extracted from your policy document.*`;
+            }
+            
+            if (queryLower.includes('emergency') || queryLower.includes('urgent')) {
+                return `For emergency situations with your ${planName}:\n\n🚨 **Emergency Care:**\n• Call 911 for life-threatening emergencies\n• Emergency room visits covered after deductible\n• Urgent care: $50 co-pay\n• 24/7 nurse hotline available\n\n⚡ *Emergency procedures based on your plan terms.*`;
+            }
+            
+            // Generic intelligent response
+            const responses = [
+                `I've analyzed your ${planName} document for information about "${query}". Based on the extracted data and policy terms, your plan provides specific coverage details that I can explain further.`,
+                `Using NLP analysis of your uploaded document, I found relevant information about "${query}". Your ${planName} includes provisions for this topic in your policy coverage.`,
+                `Based on the semantic search through your document content regarding "${query}", your insurance plan has specific terms and conditions that apply to your situation.`
+            ];
+            
+            const randomResponse = responses[Math.floor(Math.random() * responses.length)];
+            return randomResponse + `\n\n🤖 *Response generated using advanced NLP pipeline with vector similarity search and context enrichment.*`;
+        }
+        
+        // Add message to chat
+        function addMessage(type, content) {
+            const messagesContainer = document.getElementById('chatMessages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${type}-message`;
+            
+            // Convert markdown-style formatting
+            const formattedContent = content
+                .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                .replace(/\n/g, '<br>');
+                
+            messageDiv.innerHTML = formattedContent;
+            messagesContainer.appendChild(messageDiv);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+        
+        // Initialize demo with dynamic content
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add some demo activity after page load
+            setTimeout(() => {
+                document.getElementById('queryAccuracy').textContent = '95%';
+            }, 2000);
+            
+            // Show welcome message with typing effect
+            setTimeout(() => {
+                const welcomeMsg = "💡 **Pro Tip:** Upload a document first, then try asking specific questions about your plan details, costs, or coverage!";
+                addMessage('bot', welcomeMsg);
+            }, 1000);
+        });
+        
+        // Add smooth scrolling for better UX
+        document.querySelectorAll('.nav-tab').forEach(tab => {
+            tab.addEventListener('click', function() {
+                document.querySelector('.container').scrollIntoView({ 
+                    behavior: 'smooth', 
+                    block: 'start' 
+                });
+            });
+        });
+    </script>
+</body>
+</html>
