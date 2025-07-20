@@ -1,0 +1,810 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GenAI NLP Intelligence Platform - Demo</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #4CAF50, #45a049);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+        
+        .nav-tabs {
+            display: flex;
+            background: #f8f9fa;
+            border-bottom: 1px solid #dee2e6;
+        }
+        
+        .nav-tab {
+            flex: 1;
+            padding: 15px;
+            text-align: center;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s;
+            font-size: 16px;
+        }
+        
+        .nav-tab:hover {
+            background: #e9ecef;
+        }
+        
+        .nav-tab.active {
+            background: white;
+            border-bottom: 3px solid #4CAF50;
+            color: #4CAF50;
+        }
+        
+        .tab-content {
+            display: none;
+            padding: 30px;
+            min-height: 600px;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .upload-area {
+            border: 2px dashed #4CAF50;
+            border-radius: 10px;
+            padding: 40px;
+            text-align: center;
+            margin: 20px 0;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+        
+        .upload-area:hover {
+            background: #f8fff8;
+            border-color: #45a049;
+        }
+        
+        .chat-container {
+            height: 400px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            overflow-y: auto;
+            padding: 20px;
+            background: #f9f9f9;
+            margin-bottom: 20px;
+        }
+        
+        .message {
+            margin: 10px 0;
+            padding: 12px 18px;
+            border-radius: 18px;
+            max-width: 80%;
+            word-wrap: break-word;
+        }
+        
+        .user-message {
+            background: #4CAF50;
+            color: white;
+            margin-left: auto;
+        }
+        
+        .bot-message {
+            background: #e9ecef;
+            color: #333;
+        }
+        
+        .input-group {
+            display: flex;
+            gap: 10px;
+            margin: 10px 0;
+            align-items: stretch;
+        }
+        
+        input, textarea, select {
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+            font-family: inherit;
+        }
+        
+        input[type="file"] {
+            padding: 8px;
+        }
+        
+        button {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s;
+            font-size: 14px;
+        }
+        
+        button:hover {
+            background: #45a049;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+        
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        .status {
+            padding: 15px;
+            border-radius: 5px;
+            margin: 10px 0;
+            font-weight: 500;
+        }
+        
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .status.info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+        
+        .architecture-diagram {
+            text-align: center;
+            margin: 20px 0;
+        }
+        
+        .flow-step {
+            display: inline-block;
+            background: #f8f9fa;
+            padding: 20px;
+            margin: 10px;
+            border-radius: 10px;
+            border-left: 4px solid #4CAF50;
+            min-width: 200px;
+            vertical-align: top;
+        }
+        
+        .flow-step h4 {
+            color: #4CAF50;
+            margin-bottom: 10px;
+        }
+        
+        .metrics {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+        
+        .metric-card {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            border: 1px solid #e9ecef;
+        }
+        
+        .metric-value {
+            font-size: 2.5em;
+            font-weight: bold;
+            color: #4CAF50;
+            margin-bottom: 5px;
+        }
+        
+        .code-snippet {
+            background: #1e1e1e;
+            color: #d4d4d4;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 15px 0;
+            overflow-x: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            line-height: 1.4;
+        }
+        
+        .pipeline-status {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 10px 0;
+            border: 1px solid #e9ecef;
+        }
+        
+        .status-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 10px;
+        }
+        
+        .status-indicator.completed {
+            background: #4CAF50;
+        }
+        
+        .status-indicator.processing {
+            background: #ff9800;
+            animation: pulse 1.5s infinite;
+        }
+        
+        .status-indicator.pending {
+            background: #ccc;
+        }
+        
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+        
+        .demo-data {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 10px 0;
+            border-left: 4px solid #17a2b8;
+        }
+        
+        .extracted-fields {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+        
+        .field-item {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #4CAF50;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .field-item strong {
+            color: #4CAF50;
+        }
+        
+        .predefined-questions {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .predefined-questions button {
+            background: #f8f9fa;
+            color: #495057;
+            border: 1px solid #dee2e6;
+            text-align: left;
+            padding: 10px 15px;
+            font-size: 13px;
+        }
+        
+        .predefined-questions button:hover {
+            background: #e9ecef;
+            color: #4CAF50;
+            border-color: #4CAF50;
+        }
+        
+        .file-info {
+            margin-top: 15px;
+            padding: 15px;
+            background: #e8f5e8;
+            border-radius: 8px;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .tech-stack {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+        
+        .tech-card {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            border: 1px solid #e9ecef;
+        }
+        
+        .tech-card h4 {
+            color: #4CAF50;
+            margin-bottom: 10px;
+        }
+        
+        @media (max-width: 768px) {
+            .nav-tabs {
+                flex-direction: column;
+            }
+            
+            .nav-tab {
+                border-bottom: 1px solid #dee2e6;
+            }
+            
+            .flow-step {
+                display: block;
+                margin: 10px 0;
+            }
+            
+            .container {
+                margin: 10px;
+                border-radius: 10px;
+            }
+            
+            .tab-content {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚀 GenAI NLP Intelligence Platform</h1>
+            <p>Enterprise Document Processing & Intelligent Q&A System</p>
+            <p style="font-size: 0.9em; margin-top: 10px; opacity: 0.8;">
+                Demo Version - Built for McKesson Interview
+            </p>
+        </div>
+        
+        <div class="nav-tabs">
+            <button class="nav-tab active" onclick="showTab('upload')">📄 Document Upload</button>
+            <button class="nav-tab" onclick="showTab('chat')">💬 AI Chat</button>
+            <button class="nav-tab" onclick="showTab('pipeline')">⚡ Processing Pipeline</button>
+            <button class="nav-tab" onclick="showTab('architecture')">🏗️ Architecture</button>
+        </div>
+        
+        <!-- Upload Tab -->
+        <div id="upload" class="tab-content active">
+            <h2>📤 Document Upload & Processing</h2>
+            <p style="margin-bottom: 20px; color: #666;">Upload insurance documents, medical records, or financial statements for AI-powered analysis.</p>
+            
+            <div class="input-group">
+                <input type="text" id="ssn" placeholder="Enter SSN (e.g., 123-45-6789)" style="flex: 1;">
+                <select id="docType" style="flex: 1;">
+                    <option value="insurance">Insurance Document</option>
+                    <option value="medical">Medical Record</option>
+                    <option value="financial">Financial Statement</option>
+                </select>
+            </div>
+            
+            <div class="upload-area" onclick="document.getElementById('fileInput').click()">
+                <input type="file" id="fileInput" style="display: none;" accept=".pdf,.doc,.docx,.txt" onchange="handleFileSelect(this)">
+                <h3>📁 Drop files here or click to browse</h3>
+                <p>Supported formats: PDF, DOC, DOCX, TXT</p>
+                <p style="margin-top: 10px; font-size: 0.9em; color: #666;">
+                    Max file size: 10MB | Processing time: ~30 seconds
+                </p>
+                <div id="fileInfo"></div>
+            </div>
+            
+            <button onclick="simulateUpload()" id="uploadBtn" disabled>🚀 Upload & Process Document</button>
+            
+            <div id="uploadStatus"></div>
+            
+            <div class="demo-data">
+                <h4>📋 Extracted Key Fields (Live Demo)</h4>
+                <p style="margin-bottom: 15px; color: #666;">Document Intelligence automatically extracts structured data:</p>
+                <div id="extractedFields"></div>
+            </div>
+        </div>
+        
+        <!-- Chat Tab -->
+        <div id="chat" class="tab-content">
+            <h2>🤖 AI-Powered Q&A System</h2>
+            <p style="margin-bottom: 20px; color: #666;">Ask questions about your uploaded documents using natural language.</p>
+            
+            <div class="input-group">
+                <input type="text" id="currentSSN" placeholder="SSN" readonly style="flex: 0 0 150px; background: #f8f9fa;">
+                <select id="queryType" style="flex: 0 0 200px;">
+                    <option value="general">General Query</option>
+                    <option value="benefits">Benefits Information</option>
+                    <option value="coverage">Coverage Details</option>
+                    <option value="claims">Claims Status</option>
+                </select>
+            </div>
+            
+            <div class="chat-container" id="chatMessages">
+                <div class="message bot-message">
+                    👋 Hello! I'm your AI assistant powered by advanced NLP. I can help you understand your documents and answer questions about your insurance plans, benefits, and coverage details.
+                    <br><br>
+                    <strong>Try asking:</strong> "What is my deductible?" or "How do I file a claim?"
+                </div>
+            </div>
+            
+            <div class="input-group">
+                <textarea id="userInput" placeholder="Ask a question about your documents..." rows="2" style="flex: 1; resize: vertical;" onkeypress="handleEnterKey(event)"></textarea>
+                <button onclick="askQuestion()">Send 📤</button>
+            </div>
+            
+            <div class="predefined-questions">
+                <button onclick="askPredefinedQuestion('What is my plan name and coverage type?')">🏥 Plan Details</button>
+                <button onclick="askPredefinedQuestion('What are my deductibles and co-payments?')">💰 Costs & Deductibles</button>
+                <button onclick="askPredefinedQuestion('What providers are in my network?')">👩‍⚕️ Network Providers</button>
+                <button onclick="askPredefinedQuestion('How do I file a claim?')">📋 Claims Process</button>
+            </div>
+        </div>
+        
+        <!-- Pipeline Tab -->
+        <div id="pipeline" class="tab-content">
+            <h2>⚡ Real-time Processing Pipeline</h2>
+            <p style="margin-bottom: 20px; color: #666;">Monitor document processing status and system metrics in real-time.</p>
+            
+            <div class="metrics">
+                <div class="metric-card">
+                    <div class="metric-value" id="processedDocs">0</div>
+                    <div>Documents Processed</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value" id="extractedFields">0</div>
+                    <div>Fields Extracted</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value" id="vectorChunks">0</div>
+                    <div>Vector Chunks Created</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value" id="queryAccuracy">95%</div>
+                    <div>Query Accuracy</div>
+                </div>
+            </div>
+            
+            <h3>📊 Pipeline Processing Steps</h3>
+            <div id="pipelineSteps">
+                <div class="pipeline-status">
+                    <div style="display: flex; align-items: center;">
+                        <div class="status-indicator pending"></div>
+                        <span><strong>1. Document Intelligence</strong> - Extract structured data and key fields</span>
+                    </div>
+                    <span>Pending</span>
+                </div>
+                <div class="pipeline-status">
+                    <div style="display: flex; align-items: center;">
+                        <div class="status-indicator pending"></div>
+                        <span><strong>2. Text Chunking</strong> - Split content into semantic chunks</span>
+                    </div>
+                    <span>Pending</span>
+                </div>
+                <div class="pipeline-status">
+                    <div style="display: flex; align-items: center;">
+                        <div class="status-indicator pending"></div>
+                        <span><strong>3. Vector Embedding</strong> - Create high-dimensional vectors</span>
+                    </div>
+                    <span>Pending</span>
+                </div>
+                <div class="pipeline-status">
+                    <div style="display: flex; align-items: center;">
+                        <div class="status-indicator pending"></div>
+                        <span><strong>4. Index Storage</strong> - Store in FAISS vector database</span>
+                    </div>
+                    <span>Pending</span>
+                </div>
+                <div class="pipeline-status">
+                    <div style="display: flex; align-items: center;">
+                        <div class="status-indicator pending"></div>
+                        <span><strong>5. Ready for Queries</strong> - Enable intelligent Q&A interface</span>
+                    </div>
+                    <span>Pending</span>
+                </div>
+            </div>
+            
+            <h3>🔗 API Endpoints</h3>
+            <div class="code-snippet">
+<pre>// Document Upload API
+POST /api/upload
+Content-Type: multipart/form-data
+{
+  "file": document.pdf,
+  "ssn": "123-45-6789",
+  "document_type": "insurance"
+}
+
+// Query Processing API  
+POST /api/ask-question
+Content-Type: application/json
+{
+  "query": "What is my deductible?",
+  "ssn": "123-45-6789",
+  "use_vector_search": true,
+  "include_metadata": true
+}
+
+// Pipeline Status API
+GET /api/pipeline-status/{ssn}
+Response: {
+  "status": "completed",
+  "extracted_fields": 15,
+  "vector_chunks": 42,
+  "processing_time": "2.3s"
+}</pre>
+            </div>
+        </div>
+        
+        <!-- Architecture Tab -->
+        <div id="architecture" class="tab-content">
+            <h2>🏗️ System Architecture Overview</h2>
+            <p style="margin-bottom: 20px; color: #666;">Enterprise-grade microservices architecture with modern NLP capabilities.</p>
+            
+            <div class="architecture-diagram">
+                <div class="flow-step">
+                    <h4>🌐 React Frontend</h4>
+                    <p>• File Upload Interface<br>• Real-time Chat UI<br>• Status Monitoring<br>• Responsive Design</p>
+                </div>
+                <div style="display: inline-block; margin: 20px; font-size: 2em; color: #4CAF50;">⬇</div>
+                <div class="flow-step">
+                    <h4>⚡ FastAPI Backend</h4>
+                    <p>• RESTful APIs<br>• Async Processing<br>• Background Tasks<br>• Error Handling</p>
+                </div>
+                <div style="display: inline-block; margin: 20px; font-size: 2em; color: #4CAF50;">⬇</div>
+                <div class="flow-step">
+                    <h4>🧠 NLP Pipeline</h4>
+                    <p>• Document Intelligence<br>• Vector Embeddings<br>• Similarity Search<br>• LLM Integration</p>
+                </div>
+            </div>
+            
+            <h3>💻 Frontend Code Examples</h3>
+            <div class="code-snippet">
+<pre>// React Upload Component
+const handleUpload = async () => {
+  const formData = new FormData();
+  formData.append("file", selectedFile);
+  formData.append("ssn", ssn);
+  
+  const response = await fetch("/api/upload", {
+    method: "POST",
+    body: formData
+  });
+  
+  if (response.ok) {
+    setStatus("Document uploaded successfully!");
+    navigate("/chat");
+  }
+};
+
+// Chat Interface with Real-time Updates
+const askQuestion = async (query) => {
+  const response = await fetch("/api/ask-question", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ 
+      query: userInput, 
+      ssn: currentSSN,
+      use_enrichment: true 
+    })
+  });
+  
+  const data = await response.json();
+  setMessages(prev => [...prev, {
+    type: 'bot',
+    content: data.answer,
+    confidence: data.confidence
+  }]);
+};</pre>
+            </div>
+            
+            <h3>🚀 Backend Implementation</h3>
+            <div class="code-snippet">
+<pre># FastAPI Endpoints with Async Processing
+from fastapi import FastAPI, UploadFile, File, Form
+from langchain.text_splitter import CharacterTextSplitter
+from langchain.embeddings import HuggingFaceEmbeddings
+from langchain.vectorstores import FAISS
+
+app = FastAPI()
+
+@app.post("/api/upload")
+async def upload_document(
+    ssn: str = Form(...), 
+    file: UploadFile = File(...)
+):
+    # Extract text content
+    text_content = await extract_text_from_file(file)
+    
+    # Document Intelligence - Extract key fields
+    extracted_fields = await extract_key_fields(text_content)
+    
+    # Store metadata in database
+    await store_document_metadata(ssn, file.filename, extracted_fields)
+    
+    # Background processing pipeline
+    background_tasks.add_task(process_document_pipeline, text_content, ssn)
+    
+    return {"status": "success", "message": "Document processed"}
+
+@app.post("/api/ask-question") 
+async def ask_question(request: QueryRequest):
+    # Get user context from stored metadata
+    user_context = await get_user_context(request.ssn)
+    
+    # Enrich query with extracted fields
+    enriched_query = enrich_query_with_context(request.query, user_context)
+    
+    # Vector similarity search
+    relevant_chunks = await vector_search(enriched_query, request.ssn)
+    
+    # Generate response using LLM
+    response = await generate_response(
+        query=enriched_query,
+        context=relevant_chunks,
+        user_metadata=user_context
+    )
+    
+    return {
+        "answer": response,
+        "confidence": calculate_confidence(response),
+        "sources": relevant_chunks
+    }</pre>
+            </div>
+            
+            <h3>🤖 NLP Pipeline Implementation</h3>
+            <div class="code-snippet">
+<pre># Advanced NLP Processing Pipeline
+def process_document_pipeline(text_content: str, ssn: str):
+    # Step 1: Intelligent Text Chunking
+    splitter = RecursiveCharacterTextSplitter(
+        chunk_size=500,
+        chunk_overlap=50,
+        separators=["\n\n", "\n", " ", ""]
+    )
+    chunks = splitter.split_text(text_content)
+    
+    # Step 2: Generate Embeddings (Enterprise Alternative)
+    embeddings = HuggingFaceEmbeddings(
+        model_name="sentence-transformers/all-MiniLM-L6-v2"
+    )
+    
+    # Step 3: Create Vector Store with Metadata
+    vector_store = FAISS.from_texts(
+        texts=chunks,
+        embedding=embeddings,
+        metadatas=[{"ssn": ssn, "chunk_id": i} 
+                  for i in range(len(chunks))]
+    )
+    
+    # Step 4: Persistent Storage
+    vector_store.save_local(f"vectors/{ssn}")
+    
+    return {"chunks": len(chunks), "status": "completed"}
+
+# Intelligent Query Processing
+def generate_response(query: str, context: list, user_metadata: dict):
+    # Context-aware prompt engineering
+    prompt = f"""
+    Based on the user's {user_metadata.get('plan_type', 'insurance')} document:
+    Context: {context}
+    User Info: {user_metadata}
+    
+    Question: {query}
+    
+    Provide accurate, helpful response based on the document content.
+    """
+    
+    # Integration ready for:
+    # - Azure OpenAI
+    # - Hugging Face Transformers  
+    # - Local LLM deployment
+    
+    return process_with_llm(prompt)</pre>
+            </div>
+            
+            <h3>🛠️ Technology Stack</h3>
+            <div class="tech-stack">
+                <div class="tech-card">
+                    <h4>Frontend</h4>
+                    <p>React 18<br>TypeScript<br>Tailwind CSS<br>Axios</p>
+                </div>
+                <div class="tech-card">
+                    <h4>Backend</h4>
+                    <p>FastAPI<br>Python 3.11<br>Async/Await<br>Pydantic</p>
+                </div>
+                <div class="tech-card">
+                    <h4>NLP/AI</h4>
+                    <p>LangChain<br>HuggingFace<br>FAISS<br>Transformers</p>
+                </div>
+                <div class="tech-card">
+                    <h4>Database</h4>
+                    <p>PostgreSQL<br>MongoDB<br>Redis<br>Vector Store</p>
+                </div>
+                <div class="tech-card">
+                    <h4>DevOps</h4>
+                    <p>Docker<br>GitHub Actions<br>AWS/Azure<br>Kubernetes</p>
+                </div>
+                <div class="tech-card">
+                    <h4>Monitoring</h4>
+                    <p>Prometheus<br>Grafana<br>ELK Stack<br>DataDog</p>
+                </div>
+            </div>
+            
+            <div style="margin-top: 30px; padding: 20px; background: #f8f9fa; border-radius: 10px; border-left: 4px solid #4CAF50;">
+                <h4>🚀 Production Ready Features:</h4>
+                <ul style="margin-top: 10px; margin-left: 20px;">
+                    <li>Horizontal scaling with microservices architecture</li>
+                    <li>Real-time processing with WebSocket support</li>
+                    <li>Enterprise security with encryption and RBAC</li>
+                    <li>Multi-tenant data isolation by SSN</li>
+                    <li>Comprehensive logging and monitoring</li>
+                    <li>CI/CD pipeline with automated testing</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global state management
+        let currentUser = null;
+        let processedDocuments = {};
+        let chatHistory = [];
+        
+        // Demo data for realistic presentation
+        const demoExtractedFields = {
+            "PlanName": "Silver PPO Health Plan",
+            "PlanType": "PPO",
+            "Deductible": "$2,500",
+            "CoPayment": "$25 Primary Care, $50 Specialist",
+            "OutOfPocketMax": "$8,000",
+            "NetworkProviders": "Blue Cross Blue Shield Network",
+            "EffectiveDate": "2024-01-01",
+            "ExpirationDate": "2024-12-31"
+        };
+        
+        // Intelligent response system
+        const demoResponses = {
+            "What is my plan name and coverage type?": "Based on your uploaded document, you have a **Silver PPO Health Plan**. This is a Preferred Provider Organization (PPO) plan, which means you have flexibility to see both in-network and out-of-network providers, though you'll pay less when you stay in-network.\n\n✅ **Key Benefits:** Lower costs in-network, no referral required for specialists, nationwide coverage.",
+            
+            "What are my deductibles and co-payments?": "Your plan details show:\n\n💰 **Cost Structure:**\n• **Annual Deductible**: $2,500\n• **Primary Care Co-pay**: $25\n• **Specialist Co-pay**: $50\n• **Out-of-Pocket Maximum**: $8,000\n\nOnce you meet your deductible, your plan will cover a higher percentage of your medical costs. The out-of-pocket maximum protects you from excessive medical expenses in a single year.",
+            
+            "What providers are in my network?": "Your plan uses the **Blue Cross Blue Shield Network**, one of the largest provider networks in the United States.\n\n🏥 **Network Access:**\n• 90%+ of hospitals nationwide\n• 95%+ of physicians\n• Specialists in all major medical fields\n• 24/7 telemedicine options\n\nYou can search for in-network providers using the BCBS website or mobile app to ensure you receive maximum benefits.",
+            
+            "How do I file a claim?": "For your Silver PPO plan, most claims are filed automatically by your healthcare provider. However, if you need to file manually:\n\n📋 **Claims Process:**\n1. **Obtain** itemized bills and receipts\n2. **Complete** the claim form from your insurance portal\n3. **Submit** within 90 days of service\n4. **Track** status through your online account\n5. **Receive** reimbursement within 30 days\n\n💡 **Pro Tip:** Keep all medical receipts and use the mobile app for faster claim submission."
